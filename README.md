@@ -3,6 +3,8 @@ Polly Voice mixing with background music for nodejs ASK-SDK v2
 
 This project is based on npm project lambda-audio: npmjs.com/package/lambda-audio and uses SoX (Sound eXchange) command line tool in an AWS Lambda compiled version.
 
+But I had to edit the npm lambda-audio package at two locations. See below #6! This is important!
+
 It allows you to generate Amazon Polly Voices in different languages mixed with background music / sounds. 
 
 This can be used in any Amazon Alexa skill that is written in node.js / ASK-SDK v2. Can probably be ported to Jovo Framework or other frameworks as well. Feel free to do so, but please link to this project for reference!
