@@ -14,17 +14,13 @@ This can be used in any Amazon Alexa skill that is written in node.js / ASK-SDK 
 
 -> https://developer.amazon.com/alexa/console/ask
 
-2. Create a new Lambda Function. Make sure lambda function has execution / access rights for Polly, S3, (basic: DynamoDB for Persistant Storage, Cloudwatch for log files)
+2. Create a new Lambda Function. Make sure lambda function has execution / access rights for Polly, S3, (basic: DynamoDB for Persistant Storage, Cloudwatch for log files) (*see screenshot #1*)
 
-![setup #1 permissions](https://digivoice.io/wp-content/uploads/2019/04/setup-things.jpg)
+-> https://eu-west-1.console.aws.amazon.com/lambda/home?region=eu-west-1#/functions
 
-2.1. https://eu-west-1.console.aws.amazon.com/lambda/home?region=eu-west-1#/functions
+-> create a role here: https://console.aws.amazon.com/iam/home?#/roles make sure to add AmazonS3FullAccess and AmazonPollyFullAccess!
 
-2.2. create a role here: https://console.aws.amazon.com/iam/home?#/roles make sure to add AmazonS3FullAccess and AmazonPollyFullAccess!
-
-3. Lambda Function Timeout set to 15 seconds as in some edge cases it might take longer than default 3 seconds to generate polly and mix with background
-
-![setup #2 timeout](https://digivoice.io/wp-content/uploads/2019/04/setup-things_2.jpg)
+3. Lambda Function Timeout set to 15 seconds as in some edge cases it might take longer than default 3 seconds to generate polly and mix with background (*see screenshot #2*)
 
 4. Put your background music in lambda/function/audio folder. It has to be the same format as polly, so 48kb/s 22050 hz. Use "Lame XP" or other tools like ffmpeg
 
@@ -33,3 +29,8 @@ This can be used in any Amazon Alexa skill that is written in node.js / ASK-SDK 
 6. Pull this PoC Skill and try it out! Code is documented. I know it's not perfect, but I think everyone will understand it. If not, always feel free to get in touch: daniel@digivoice.io or https://twitter.com/DanMittendorf
 
 7. You could also use ask-cli to deploy this code pretty easy. ;-)
+
+# Screenshots for reference
+<img width="400" alt="setup #1 permissions" src="https://digivoice.io/wp-content/uploads/2019/04/setup-things.jpg"/>
+<img width="400" alt="setup #2 timeout" src="https://digivoice.io/wp-content/uploads/2019/04/setup-things_2.jpg"/>
+
