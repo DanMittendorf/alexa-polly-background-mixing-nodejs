@@ -90,10 +90,10 @@ lambdaAudio.sox ('-m '+background_mp3+' '+polly_voice_mp3+' -C 48.01 '+resulting
  * voice: name of polly voice: https://docs.aws.amazon.com/de_de/polly/latest/dg/voicelist.html)
  * background_sound: see background_sfx! define audio files stored locally in your lambda "audio" folder @ 48kb/s / 22.050 Hz
  * polly_voice: temporary polly voice filename for saving in lambda /tmp/
- * sound_mix_result: filename for resulting mix of voice+background, will be saved in s3 bucket! see settings!
+ * sound_mix_result: filename for resulting mix of ssml+voice+background, will be saved in s3 bucket! see settings!
  **/
 async function generatePollyUrl (ssml, voice, background_sound) {
-  let sound_mix_result = crypto.createHash('md5').update(voice+background_sound).digest('hex')+".mp3"; //create a standard filename based on ssml voice and background music  greate a universal md5 hash for shorter filename
+  let sound_mix_result = crypto.createHash('md5').update(ssml+voice+background_sound).digest('hex')+".mp3"; //create a standard filename based on ssml voice and background music  greate a universal md5 hash for shorter filename
   console.log("sound mix result filename: "+sound_mix_result);
 
   try { // first: checking if file exists, if not, do the magic
