@@ -10,8 +10,9 @@ const fs = require('fs-extra'); //required for local file write and read
 const crypto = require('crypto'); //for md5 hashing ssml string to generate a checksume filename for caching
 
 // settings
-const myRegion = 'eu-west-1' // edit for your desired region
+let myRegion = 'eu-west-1' // edit for your desired region (only eu-west-1 and us-west-1 support neural TTS voices) Joanna and Matthew
 const myBucket = ''; //bucket-name for uploading
+
 
 //make sure the audio has the same format as polly voice so, 48 kb/s and 22.050 hz mp3 make sure to not make it too loud, otherwise the polly voice cannot be understood
 const background_sfx = './audio/whales_low_volume.mp3'; 
@@ -38,12 +39,28 @@ async function copyFiles () {
 
 const generatePollyAudio = (text, voiceId) => {
   // Generate audio from Polly and check if output is a Buffer
-          const params = {
+    let params;      
+    //neural when using neural voices Joanna or Matthew, in all other cases use 'standard'
+    if (voiceId === "Joanna" || voiceId === "Matthew") {
+        params = {
+          Engine: 'neural', 
+          Text: text,
+          SampleRate: '22050',
+          OutputFormat: 'mp3',
+          TextType: 'ssml',
+          VoiceId: voiceId // see Polly API for the list http://docs.aws.amazon.com/fr_fr/polly/latest/dg/API_Voice.html#API_Voice_Contents
+         }
+    }
+    else {
+        params = {
+          Engine: 'standard',
           Text: text,
           OutputFormat: 'mp3',
           TextType: 'ssml',
           VoiceId: voiceId // see Polly API for the list http://docs.aws.amazon.com/fr_fr/polly/latest/dg/API_Voice.html#API_Voice_Contents
-          }
+         }
+    }
+        
       
           return polly.synthesizeSpeech(params).promise().then( audio => {
           if (audio.AudioStream instanceof Buffer) return audio
@@ -108,9 +125,16 @@ async function generatePollyUrl (ssml, voice, background_sound) {
       else { await copyFiles(); }//has to invoke this function in order to copy sox / lame to /tmp/ to be able to execute them later. this has to happen every time because the tmp folder get purged every few minutes - todo: implement check if files exist and have the correct permissions +x
       const pollyVoice = await generatePollyAudio(ssml, voice); 
       await fs.outputFile('/tmp/'+polly_voice, pollyVoice.AudioStream); //writes pollyAudioStream to writeable /tmp/ folder
-      const duration = await mp3Duration('/tmp/'+polly_voice); //calculate length of polly voice. this is important for mixing result because mixing of 5 seconds polly with 10 seconds background will result in 10 seconds polly + background. but you only want the background sfx to be as long as the polly voice
-      var file = await mix_polly_with_background (background_sound, '/tmp/'+polly_voice, '/tmp/'+sound_mix_result, duration); //mixes background with polly and saves to tmp folder, limited by duration of polly voice
-      const uploadFile = await fs.readFile(file); //read the file
+      
+      //use this for mixing background with polly voices
+      //const duration = await mp3Duration('/tmp/'+polly_voice); //calculate length of polly voice. this is important for mixing result because mixing of 5 seconds polly with 10 seconds background will result in 10 seconds polly + background. but you only want the background sfx to be as long as the polly voice
+      //var file = await mix_polly_with_background (background_sound, '/tmp/'+polly_voice, '/tmp/'+sound_mix_result, duration); //mixes background with polly and saves to tmp folder, limited by duration of polly voice
+      //const uploadFile = await fs.readFile(file); //remove the // in front of the line to enable mixing polly with background then make sure to comment out the next line
+      
+      //use this for neural voice only
+      const uploadFile = await fs.readFile('/tmp/'+polly_voice); //read the file
+      //end
+
       var writeToS3 = await writeAudioStreamToS3Bucket(uploadFile, sound_mix_result); 
       console.log(writeToS3.url);
     return '<audio src="'+writeToS3.url+'"/>';
@@ -131,8 +155,8 @@ const LaunchHandler = {
   async handle(handlerInput) { //important make it ASYNC
     console.log("LaunchHandler: isHandling ");
     
-    let pollyVoiceWithBackground = await generatePollyUrl("<speak>Another test with Polly voice Brian. Do you like my male voice? I certainly do like my fantastic voice! It's even greater with ocean waves in the background!</speak>", "Brian", background_sfx);
-    let easySpeakOutput = 'And here comes Brians polly voice with background sounds: '+ pollyVoiceWithBackground +' Wow, that is so cool! ';
+    let pollyVoice = await generatePollyUrl("<speak>Another test with Polly voice of Joanna. So this is my new normal neural voice. Sounds great doesn't it? Not wait for my newscaster voice. Three, two, one. Here it comes.  <amazon:domain name='news'>Hi! This is my newscaster voice! I can even read your desired text in newscaster style! Do you notice the difference? Isn't this awesome? I know a lot of great news, but I will keep this to myself for another time.</amazon:domain> Do you like my female voice? I certainly do like my fantastic voice! </speak>", "Joanna", background_sfx);
+    let easySpeakOutput = 'And here comes Joannas neural polly voice: '+ pollyVoice +' Wow, that is so cool! ';
  
     
     return handlerInput.responseBuilder
