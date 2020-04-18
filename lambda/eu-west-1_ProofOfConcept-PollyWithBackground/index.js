@@ -53,7 +53,7 @@ const generatePollyAudio = (text, voiceId) => {
     }
     else {
         params = {
-          Engine: 'standard',
+          //Engine: 'standard',
           Text: text,
           OutputFormat: 'mp3',
           TextType: 'ssml',
@@ -234,7 +234,7 @@ const ErrorHandler = {
     console.log(`Error stack: ${error.stack}`);
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes();
     return handlerInput.responseBuilder
-      .speak(requestAttributes.t('ERROR_MESSAGE'))
+      .speak("Oh, oh. Sorry! Error")
       .getResponse();
   },
 };
