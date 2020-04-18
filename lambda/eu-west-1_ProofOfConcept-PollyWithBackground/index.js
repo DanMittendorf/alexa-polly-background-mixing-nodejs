@@ -76,7 +76,7 @@ const writeAudioStreamToS3Bucket = ( audioStream, filename ) =>
         return {
             msg: 'File successfully generated.',
             ETag: res.ETag,
-            url: `https://s3-eu-west-1.amazonaws.com/${myBucket}/${filename}`
+            url: `https://s3-${myRegion}.amazonaws.com/${myBucket}/${filename}`
             }
        
 }
@@ -127,12 +127,12 @@ async function generatePollyUrl (ssml, voice, background_sound) {
       await fs.outputFile('/tmp/'+polly_voice, pollyVoice.AudioStream); //writes pollyAudioStream to writeable /tmp/ folder
       
       //use this for mixing background with polly voices
-      //const duration = await mp3Duration('/tmp/'+polly_voice); //calculate length of polly voice. this is important for mixing result because mixing of 5 seconds polly with 10 seconds background will result in 10 seconds polly + background. but you only want the background sfx to be as long as the polly voice
-      //var file = await mix_polly_with_background (background_sound, '/tmp/'+polly_voice, '/tmp/'+sound_mix_result, duration); //mixes background with polly and saves to tmp folder, limited by duration of polly voice
-      //const uploadFile = await fs.readFile(file); //remove the // in front of the line to enable mixing polly with background then make sure to comment out the next line
+      const duration = await mp3Duration('/tmp/'+polly_voice); //calculate length of polly voice. this is important for mixing result because mixing of 5 seconds polly with 10 seconds background will result in 10 seconds polly + background. but you only want the background sfx to be as long as the polly voice
+      var file = await mix_polly_with_background (background_sound, '/tmp/'+polly_voice, '/tmp/'+sound_mix_result, duration); //mixes background with polly and saves to tmp folder, limited by duration of polly voice
+      const uploadFile = await fs.readFile(file); //remove the // in front of the line to enable mixing polly with background then make sure to comment out the next line
       
       //use this for neural voice only
-      const uploadFile = await fs.readFile('/tmp/'+polly_voice); //read the file
+      //const uploadFile = await fs.readFile('/tmp/'+polly_voice); //read the file
       //end
 
       var writeToS3 = await writeAudioStreamToS3Bucket(uploadFile, sound_mix_result); 
@@ -155,8 +155,16 @@ const LaunchHandler = {
   async handle(handlerInput) { //important make it ASYNC
     console.log("LaunchHandler: isHandling ");
     
-    let pollyVoice = await generatePollyUrl("<speak>Another test with Polly voice of Joanna. So this is my new normal neural voice. Sounds great doesn't it? Not wait for my newscaster voice. Three, two, one. Here it comes.  <amazon:domain name='news'>Hi! This is my newscaster voice! I can even read your desired text in newscaster style! Do you notice the difference? Isn't this awesome? I know a lot of great news, but I will keep this to myself for another time.</amazon:domain> Do you like my female voice? I certainly do like my fantastic voice! </speak>", "Joanna", background_sfx);
-    let easySpeakOutput = 'And here comes Joannas neural polly voice: '+ pollyVoice +' Wow, that is so cool! ';
+	//New Polly with Newscaster Style
+    //let pollyVoice = await generatePollyUrl("<speak>Another test with Polly voice of Joanna. So this is my new normal neural voice. Sounds great doesn't it? Not wait for my newscaster voice. Three, two, one. Here it comes.  <amazon:domain name='news'>Hi! This is my newscaster voice! I can even read your desired text in newscaster style! Do you notice the difference? Isn't this awesome? I know a lot of great news, but I will keep this to myself for another time.</amazon:domain> Do you like my female voice? I certainly do like my fantastic voice! </speak>", "Joanna", background_sfx);
+	//let easySpeakOutput = 'And here comes Joannas neural polly voice: '+ pollyVoice +' Wow, that is so cool! ';
+	
+	//Old Polly Voice
+	let pollyVoiceWithBackground = await generatePollyUrl("<speak>Another test with Polly voice Brian. Do you like my male voice? I certainly do like my fantastic voice! It's even greater with ocean waves in the background!</speak>", "Brian", background_sfx);
+    let easySpeakOutput = 'And here comes Brians polly voice with background sounds: '+ pollyVoiceWithBackground +' Wow, that is so cool! ';
+ 
+	
+    
  
     
     return handlerInput.responseBuilder
