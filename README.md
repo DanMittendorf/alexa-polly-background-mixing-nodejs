@@ -1,4 +1,7 @@
 # alexa-polly-background-mixing-nodejs
+
+:warning: **APL-A has been released**: Please know that there is APL-A for mixing and matching Audios. See: https://developer.amazon.com/de-DE/docs/alexa/alexa-presentation-language/apla-document.html. I'd advise anyone to use APL-A as you can officially mix and match even Alexas own voice with background music now!
+
 Polly Voice mixing with background music for nodejs ASK-SDK v2
 
 This project is based on npm project lambda-audio: npmjs.com/package/lambda-audio and uses SoX (Sound eXchange) command line tool in an AWS Lambda compiled version.
