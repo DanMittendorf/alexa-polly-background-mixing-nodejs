@@ -12,7 +12,7 @@
     "ask-sdk": "^2.8.0",
     "ask-sdk-core": "^2.8.0",
     "ask-sdk-model": "^1.28.0",
-    "aws-sdk": "^2.658.0",
+    "aws-sdk": "^2.814.0",
     "fs-extra": "^7.0.0",
     "lambda-audio": "^1.0.0",
     "mp3-duration": "^1.1.0"
